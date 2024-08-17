@@ -1,0 +1,178 @@
+/* Reset CSS để đảm bảo tính nhất quán giữa các trình duyệt */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Cài đặt cơ bản cho body */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #F8F9FB;
+}
+
+/* Cài đặt cho header */
+header {
+    background-color: #007BFF;
+    color: #fff;
+    padding: 15px;
+    text-align: center;
+}
+
+header h1 {
+    margin-bottom: 10px;
+}
+
+
+.header-buttons a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 10px;
+    padding: 5px 10px;
+    border: 1px solid #fff;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+
+}
+
+.header-buttons a:hover {
+    background-color: #0056b3;
+    color: #fff;
+}
+
+/* Dropdown menu */
+.dropdown {
+    position: relative;
+    display: inline-block;
+
+}
+
+.dropdown a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+      margin-left:40px;
+}
+
+.dropdown-content a {
+    color: #333;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Cài đặt cho main */
+main {
+    padding: 20px;
+}
+
+main h2 {
+    color: #007BFF;
+    margin-bottom: 10px;
+}
+
+/* Cài đặt cho danh sách */
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    margin-bottom: 15px;
+}
+
+/* Cài đặt cho các phần tử trong danh sách */
+#specialization-list p, #clinic-list p {
+    margin: 5px 0;
+}
+
+/* Cài đặt cho phần top specialization */
+#top-specialization {
+    font-weight: bold;
+      width: 50%;
+
+
+}
+
+
+
+ .card-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 50vh; /* Điều chỉnh chiều cao tùy ý */
+        }
+        .card {
+            max-width: 300px; /* Điều chỉnh chiều rộng tùy ý */
+            margin: 0 auto;
+        }
+
+
+#top-specialization .card {
+    border: none; /* Loại bỏ border  */
+
+}
+
+
+
+
+/* Cài đặt cho footer */
+         footer {
+            background-color: #343a40;
+            color: white;
+            padding: 20px 0;
+        }
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .footer-content .col {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px;
+        }
+        .footer-content h5 {
+            border-bottom: 2px solid #565656;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+        .footer-content ul {
+            list-style: none;
+            padding: 0;
+        }
+        .footer-content ul li {
+            margin-bottom: 10px;
+        }
+        .footer-content ul li a {
+            color: white;
+            text-decoration: none;
+        }
+        .footer-content ul li a:hover {
+            text-decoration: underline;
+        }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 10px;
+            border-top: 1px solid #565656;
+        }
+

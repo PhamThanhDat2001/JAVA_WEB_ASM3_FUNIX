@@ -1,0 +1,216 @@
+/* Reset CSS để đảm bảo tính nhất quán giữa các trình duyệt */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Cài đặt cơ bản cho body */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #F8F9FB;
+}
+
+/* Cài đặt cho header */
+header {
+    background-color: #007BFF;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    margin-bottom: 10px;
+    font-size: 2rem;
+}
+
+/* Cài đặt cho các liên kết trong header */
+.header-buttons a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 15px;
+    padding: 10px 15px;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    font-size: 1rem;
+}
+
+.header-buttons a:hover {
+    background-color: #0056b3;
+    color: #fff;
+    border-color: #0056b3;
+}
+
+/* Dropdown menu */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown a {
+
+    color: #fff;
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+.dropdown-content {
+
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    min-width: 200px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.dropdown-content a {
+    color: #333;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 0.9rem;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Cài đặt cho container chính */
+.container {
+    padding: 20px;
+}
+
+/* Cài đặt cho tiêu đề chính */
+.container h1 {
+    color: #007BFF;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+/* Cài đặt cho bảng */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table thead {
+    background-color: #007BFF;
+    color: #fff;
+}
+
+.table th, .table td {
+    padding: 12px;
+    text-align: left;
+}
+
+.table th {
+    font-size: 1rem;
+}
+
+.table td {
+    font-size: 0.9rem;
+    border-bottom: 1px solid #ddd;
+}
+
+.table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Cài đặt cho footer */
+footer {
+    background-color: #007BFF;
+    color: #fff;
+    text-align: center;
+    padding: 15px;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Cài đặt cho modal */
+.modal-content {
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    border-bottom: 1px solid #ddd;
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-footer {
+    border-top: 1px solid #ddd;
+    padding: 10px;
+}
+
+.btn-primary {
+    background-color: #007BFF;
+    border: none;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* Cài đặt cho card container */
+.card-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+}
+
+.card {
+    max-width: 350px;
+    margin: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.card img {
+    width: 100%;
+    border-bottom: 1px solid #ddd;
+}
+
+.card-body {
+    padding: 15px;
+    text-align: center;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+}
+
+.card-text {
+    font-size: 1rem;
+    color: #666;
+}

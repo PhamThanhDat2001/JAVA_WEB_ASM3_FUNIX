@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Details</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #F8F9FB;
+        }
+        .doctor-details {
+            margin-top: 20px;
+        }
+        .doctor-details h2 {
+            margin-bottom: 20px;
+        }
+        .doctor-details .card {
+            margin-bottom: 20px;
+        }
+        .doctor-details .btn-book {
+            margin-top: 10px;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .form-control {
+            border-radius: 0.25rem;
+        }
+        .btn-primary {
+            border-radius: 0.25rem;
+        }
+        .container a {
+            display: inline-block;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            text-decoration: none;
+            color: #007BFF;
+        }
+        .container a:hover {
+            text-decoration: underline;
+        }
+        .card-title {
+            font-weight: bold;
+            color: #343A40;
+        }
+    </style>
+</head>
+<body>
+<div class="container doctor-details">
+    <a href="/api/v1/home" >Trang chủ</a>
+    <h2>Đặt lịch khám</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <form id="appointment-form">
+                <h5 class="card-title">Thông tin bác sĩ</h5>
+                <p class="card-text"><strong>Tên bác sĩ:</strong> <span id="doctor-name"></span></p>
+                <p class="card-text"><strong>Bệnh viện: </strong><span id="namextraInfose"></span></p>
+                <div class="form-group">
+                    <label for="datetime"><strong>Chọn thời gian khám:</strong></label>
+                    <input type="datetime-local" class="form-control" id="datetime" name="datetime" required>
+                </div>
+                <p class="card-text"><strong>Giá khám (VNĐ): </strong> <span id="consultation-cost"> VNĐ</span></p>
+
+                <h5 class="card-title">Thông tin cá nhân</h5>
+                <div class="form-group">
+                    <label for="name"><strong>Tên:</strong></label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="gender"><strong>Giới tính:</strong></label>
+                    <select class="form-control" id="gender" name="gender" required>
+                        <option value="Male">Nam</option>
+                        <option value="Female">Nữ</option>
+                        <option value="Other">Khác</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="phone"><strong>Số điện thoại:</strong></label>
+                    <input type="text" class="form-control" id="phone" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="date"><strong>Ngày tháng năm sinh:</strong></label>
+                    <input type="date" class="form-control" id="date" name="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="address"><strong>Địa chỉ:</strong></label>
+                    <input type="text" class="form-control" id="address" name="address" required>
+                </div>
+                <div class="form-group">
+                    <label for="reason"><strong>Lý do thăm khám:</strong></label>
+                    <textarea class="form-control" id="reason" name="reason" rows="3" required></textarea>
+                </div>
+
+                <input type="hidden" name="specializationId" id="hidden-specialization-id">
+                <input type="hidden" name="clinicId" id="hidden-clinic-id">
+                <input type="hidden" name="doctorId" id="hidden-doctor-id">
+                <input type="hidden" name="userId" id="hidden-user-id">
+                <input type="hidden" name="consultationCost" id="hidden-consultation-cost">
+                <input type="hidden" name="dateTime" id="hidden-date-time">
+                <button type="button" class="btn btn-primary btn-book" id="submit-btn">Đặt lịch</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.3/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function() {
+     function getUrlParameter(name) {
+         name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+         var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+         var results = regex.exec(location.search);
+         return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+     }
+
+     // Lấy các tham số từ URL
+     var doctorId = getUrlParameter('doctorId');
+     var specializationId = getUrlParameter('specId');
+     var consultationCost = getUrlParameter('consultationCost');
+     var dateTime = getUrlParameter('dateTime');
+     var clinicId = getUrlParameter('clinicId');
+     var namextraInfose = getUrlParameter('namextraInfose');
+     var doctorName = getUrlParameter('name');
+
+     // Đặt các giá trị trong HTML
+     $('#doctor-name').text(doctorName);
+     $('#consultation-cost').text(consultationCost);
+     $('#namextraInfose').text(namextraInfose);
+
+     // Đặt các giá trị trong các trường ẩn
+     $('#hidden-specialization-id').val(specializationId);
+     $('#hidden-clinic-id').val(clinicId);
+     $('#hidden-doctor-id').val(doctorId);
+     $('#hidden-consultation-cost').val(consultationCost);
+     $('#hidden-date-time').val(dateTime);
+
+     // Lấy userId từ localStorage và đặt nó
+     var userId = localStorage.getItem('userId');
+     $('#hidden-user-id').val(userId);
+
+     // Đặt thời gian mặc định nếu có
+     if (dateTime) {
+         $('#datetime').val(dateTime);
+     }
+
+     // Xử lý gửi form
+     $('#submit-btn').click(function() {
+         var formData = {
+             specializationId: $('#hidden-specialization-id').val(),
+             clinicId: $('#hidden-clinic-id').val(),
+             doctorId: $('#hidden-doctor-id').val(),
+             userId: $('#hidden-user-id').val(),
+             date: $('#date').val(),
+             consultationCost: $('#hidden-consultation-cost').val(),
+             name: $('#name').val(),
+             dateTime: $('#datetime').val(),
+             gender: $('#gender').val(),
+             phone: $('#phone').val(),
+             address: $('#address').val(),
+             note: $('#reason').val()
+         };
+
+         // Kiểm tra dữ liệu form trước khi gửi
+         console.log('Form Data:', formData);
+
+         $.ajax({
+             url: '/api/v1/schedule/appointmentss',
+             type: 'POST',
+             contentType: 'application/json',
+             data: JSON.stringify(formData),
+             success: function(response) {
+                 alert('Đặt lịch thành công!');
+             },
+             error: function(xhr, status, error) {
+                 alert('Đặt lịch không thành công: ' + xhr.responseText);
+             }
+         });
+     });
+ });
+
+</script>
+</body>
+</html>

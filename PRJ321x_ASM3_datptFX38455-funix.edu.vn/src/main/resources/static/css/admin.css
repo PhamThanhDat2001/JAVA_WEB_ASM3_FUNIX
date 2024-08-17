@@ -1,0 +1,153 @@
+/* styles.css */
+
+/* General Styles */
+body {
+    padding-top: 45px;
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    height: 100%;
+    width: 250px;
+    padding: 20px;
+    background-color: #343a40;
+    color: #fff;
+}
+
+.sidebar .nav-item {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.sidebar .nav-link {
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    display: block;
+}
+
+.sidebar .nav-link:hover {
+    background-color: #495057;
+}
+
+.sidebar .nav-link.active {
+    background-color: #007bff;
+}
+
+/* Main Content Styles */
+.main-content {
+    margin-left: 240px;
+    padding: 20px;
+}
+
+/* Content Section */
+.content {
+    display: none;
+}
+
+/* Welcome Section */
+#welcome {
+    text-align: center;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 20px;
+}
+
+/* Status Colors */
+.active-status-true {
+    color: green;
+}
+
+.active-status-false {
+    color: red;
+}
+
+/* Modal Styles */
+.modal-header .close {
+    outline: none;
+}
+
+/* Error Message Styles */
+#error-message {
+    color: red;
+}
+
+/* Button Styles */
+.btn-danger {
+    margin-right: 10px;
+}
+
+.btn-primary {
+    margin-left: 10px;
+}
+
+/* Table Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Form Styles */
+form {
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+form .form-group {
+    margin-bottom: 15px;
+}
+
+form .form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+form .form-group input,
+form .form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Footer Styles */
+.footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #343a40;
+    color: #fff;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}

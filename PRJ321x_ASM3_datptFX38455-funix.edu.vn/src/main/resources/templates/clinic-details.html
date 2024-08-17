@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Clinic Details</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin-top: 20px;
+        }
+        .container {
+            max-width: 800px;
+        }
+        .profile-card {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .profile-card img {
+            border-radius: 8px;
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        .profile-card h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .profile-card p {
+            font-size: 1rem;
+            color: #555;
+            line-height: 1.6;
+        }
+        .profile-card p strong {
+            color: #333;
+        }
+        .profile-card .section-title {
+            font-size: 1.5rem;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #222;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+        }
+        .profile-card .intro-html {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .profile-card .intro-markdown {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            white-space: pre-wrap;
+        }
+        .timestamp {
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 10px;
+        }
+        .timestamp strong {
+            color: #333;
+        }
+        .profile-card img {
+    border-radius: 8px;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto; /* Căn giữa ảnh */
+    display: block; /* Đảm bảo ảnh được căn giữa */
+}
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="profile-card">
+        <a href="/api/v1/home">Trang chủ </a>
+        <img id="clinic-image" src="" alt="Clinic Image">
+        <h2 id="clinic-name">Clinic Name</h2>
+        <p><strong>Địa chỉ:</strong> <span id="clinic-address">Address</span></p>
+        <p><strong>Điện thoại:</strong> <span id="clinic-phone">Phone</span></p>
+        <p><strong>Giờ làm việc:</strong> <span id="clinic-working-hours">Working Hours</span></p>
+        <p><strong>Mô tả:</strong> <span id="clinic-description">Description</span></p>
+
+        <div class="section-title">Introduction (HTML)</div>
+        <div id="clinic-introduction-html" class="intro-html">Introduction HTML</div>
+
+        <div class="section-title">Introduction (Markdown)</div>
+        <div id="clinic-introduction-markdown" class="intro-markdown">Introduction Markdown</div>
+
+        <div class="section-title">Important Notes</div>
+        <p id="clinic-important-notes">Important Notes</p>
+
+        <p class="timestamp"><strong>Created At:</strong> <span id="clinic-created-at">Created At</span></p>
+        <p class="timestamp"><strong>Updated At:</strong> <span id="clinic-updated-at">Updated At</span></p>
+        <p class="timestamp"><strong>Deleted At:</strong> <span id="clinic-deleted-at">Deleted At</span></p>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+
+        fetch(`http://localhost:8080/api/v1/clinic/details?id=${id}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const clinic = data.data;
+                    document.getElementById('clinic-name').innerText = clinic.nameExtraInfo;
+                    document.getElementById('clinic-image').src = clinic.image;
+                    document.getElementById('clinic-address').innerText = clinic.address;
+                    document.getElementById('clinic-phone').innerText = clinic.phone;
+                    document.getElementById('clinic-working-hours').innerText = clinic.workingHours;
+                    document.getElementById('clinic-description').innerText = clinic.description;
+                    document.getElementById('clinic-introduction-html').innerHTML = clinic.introductionHTML;
+                    document.getElementById('clinic-introduction-markdown').innerText = clinic.introductionMarkdown;
+                    document.getElementById('clinic-important-notes').innerText = clinic.importantNotes;
+                    document.getElementById('clinic-created-at').innerText = new Date(clinic.createdAt).toLocaleString();
+                    document.getElementById('clinic-updated-at').innerText = new Date(clinic.updatedAt).toLocaleString();
+                    document.getElementById('clinic-deleted-at').innerText = clinic.deletedAt ? new Date(clinic.deletedAt).toLocaleString() : 'Not Deleted';
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => console.error('Error fetching clinic details:', error));
+    });
+</script>
+</body>
+</html>

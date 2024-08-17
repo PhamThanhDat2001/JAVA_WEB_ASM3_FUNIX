@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Appointments</title>
+    <link rel="stylesheet" type="text/css" href="/css/doctor.css"> <!-- Liên kết đến tệp CSS -->
+
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script type="text/javascript">
+        function checkRoleAndRedirect() {
+            const roles = localStorage.getItem('roles');
+            if (roles && roles.includes('ROLE_DOCTOR')) {
+                return;
+            } else {
+                window.location.href = '/api/v1/access-denied';
+            }
+        }
+
+        // Gọi hàm kiểm tra khi trang được tải
+        document.addEventListener('DOMContentLoaded', checkRoleAndRedirect);
+    </script>
+</head>
+
+<body>
+
+<header>
+        <h1>Bác sĩ</h1>
+    <div class="header-buttons" id="authButtons">
+        <a href="/api/v1/user/login">Login</a>
+    </div>
+    <div id="userInfo" style="display: none;">
+        <div class="dropdown">
+            <a href="javascript:void(0)">Welcome, <span id="userEmail"></span></a>
+            <div class="dropdown-content">
+                <a href="/list">Danh sách</a>
+                <a href="javascript:void(0)" id="profileLink">Hồ sơ</a>
+                <a href="javascript:void(0)" id="logoutButton">Đăng xuất</a>
+            </div>
+        </div>
+    </div>
+
+</header>
+
+
+<div class="container">
+<!--    <div class="mt-4 mb-4">-->
+<!--        <a href="#" class="btn btn-primary" id="refreshButton">Nhận/hủy lịch khám</a>-->
+<!--    </div>-->
+    <h1 class="mb-4">Danh sách bệnh nhân</h1>
+    <table class="table table-bordered">
+        <thead class="thead-dark">
+        <tr>
+            <th>Họ và tên</th>
+            <th>Giới tính</th>
+            <th>Số điện thoại</th>
+            <th>Địa chỉ</th>
+            <th>Mô tả chi tiết</th>
+            <th>Ngày khám</th>
+            <th>Trạng thái</th>
+            <th>Lý do</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody id="appointmentsTable">
+        <!-- Data will be inserted here by AJAX -->
+        </tbody>
+    </table>
+</div>
+<footer>
+    <p>&copy; 2024 Your Company Name. All rights reserved.</p>
+</footer>
+<script>
+    $(document).ready(function() {
+        let selectedAppointmentId = null;
+
+        function getStatusText(statusId) {
+            switch (statusId) {
+                case 1:
+                    return 'Chờ xác nhận';
+                case 2:
+                    return 'Đã xác nhận';
+                case 3:
+                    return 'Hủy bỏ';
+                default:
+                    return 'Unknown';
+            }
+        }
+
+        function formatDateTime(dateTime) {
+            return moment(dateTime).format('DD/MM/YYYY HH:mm');
+        }
+
+        function getActionButtons(statusId, appointmentId) {
+            if (statusId === 1) {
+                return `<button class="btn btn-success" onclick="acceptAppointment(${appointmentId})">Nhận lịch</button>
+                        <button class="btn btn-danger" onclick="showCancelModal(${appointmentId})">Hủy</button>`;
+            } else if (statusId === 2) {
+                return `<button class="btn btn-danger" onclick="showCancelModal(${appointmentId})">Hủy</button>`;
+            } else {
+                return '';
+            }
+        }
+
+        function loadAppointments(doctorId) {
+            $.ajax({
+                url: '/api/v1/doctor/' + doctorId,
+                method: 'GET',
+                success: function(data) {
+                    var tableBody = $('#appointmentsTable');
+                    tableBody.empty(); // Clear existing data
+
+                    data.forEach(function(appointment) {
+                        var statusText = getStatusText(appointment.status);
+                        var formattedDateTime = formatDateTime(appointment.dateTime);
+                        var reasonText = appointment.reason ? appointment.reason : ' ';
+                        var actionButtons = getActionButtons(appointment.status, appointment.id);
+
+                        var row = `<tr>
+                            <td>${appointment.name}</td>
+                            <td>${appointment.gender}</td>
+                            <td>${appointment.phone}</td>
+                            <td>${appointment.address}</td>
+                            <td>${appointment.note}</td>
+                            <td>${formattedDateTime}</td>
+                            <td>${statusText}</td>
+                            <td>${reasonText}</td>
+                            <td>${actionButtons}</td>
+                        </tr>`;
+                        tableBody.append(row);
+                    });
+                },
+                error: function() {
+                    console.error('Failed to fetch data.');
+                }
+            });
+        }
+
+        window.acceptAppointment = function(appointmentId) {
+            $.ajax({
+                url: '/api/v1/doctor/' + appointmentId + '/accept',
+                method: 'PUT',
+                success: function(data) {
+                    alert('Lịch khám đã được nhận thành công!');
+                    loadAppointments(localStorage.getItem('userId')); // Refresh the data
+                },
+                error: function() {
+                    console.error('Failed to accept appointment.');
+                    alert('Đã xảy ra lỗi khi nhận lịch khám.');
+                }
+            });
+        }
+
+        window.showCancelModal = function(appointmentId) {
+            selectedAppointmentId = appointmentId;
+            $('#cancelModal').modal('show');
+        }
+
+        $('#cancelForm').submit(function(e) {
+            e.preventDefault(); // Prevent the default form submission
+            var reason = $('#cancelReason').val();
+            if (selectedAppointmentId && reason) {
+                $.ajax({
+                    url: '/api/v1/doctor/' + selectedAppointmentId + '/cancel',
+                    method: 'PUT',
+                    data: JSON.stringify({ status: 3, reason: reason }),
+                    contentType: 'application/json',
+                    success: function(data) {
+                        alert('Lịch khám đã được hủy thành công!');
+                        $('#cancelModal').modal('hide');
+                        loadAppointments(localStorage.getItem('userId')); // Refresh the data
+                    },
+                    error: function() {
+                        console.error('Failed to cancel appointment.');
+                        alert('Đã xảy ra lỗi khi hủy lịch khám.');
+                    }
+                });
+            } else {
+                alert('Vui lòng nhập lý do hủy.');
+            }
+        });
+
+        // Load appointments when the page loads
+        var doctorId = localStorage.getItem('userId');
+        if (doctorId) {
+            loadAppointments(doctorId);
+        } else {
+            console.error('Doctor ID not found in localStorage.');
+        }
+
+        // Refresh appointments on button click
+        $('#refreshButton').click(function(e) {
+            e.preventDefault(); // Prevent the default action
+            if (doctorId) {
+                loadAppointments(doctorId);
+            } else {
+                console.error('Doctor ID not found in localStorage.');
+            }
+        });
+    });
+</script>
+
+<!-- Modal HTML -->
+<div class="modal fade" id="cancelModal" tabindex="-1" role="dialog" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelModalLabel">Nhập lý do hủy</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="cancelForm">
+                    <div class="form-group">
+                        <label for="cancelReason">Lý do</label>
+                        <textarea class="form-control" id="cancelReason" rows="3" required></textarea>
+                        <input type="hidden" id="appointmentId" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Xác nhận hủy</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+
+
+<script>
+    $(document).ready(function() {
+        // Kiểm tra token khi tải trang
+        const token = localStorage.getItem('authToken');
+        if (token) {
+            // Hiển thị thông tin người dùng và nút đăng xuất
+            $('#userInfo').show();
+            $('#authButtons').hide();
+
+            // Giả sử bạn có email trong payload của token
+            // Bạn có thể giải mã token để lấy email hoặc thông tin người dùng khác
+            $('#userEmail').text(email); // Thay bằng email thực tế
+
+             // Cập nhật liên kết Hồ sơ với email từ localStorage
+            if (email) {
+<!--                $('#profileLink').attr('href', `/api/v1/user/profile?email=${encodeURIComponent(email)}`);-->
+                $('#profileLink').attr('href', `/api/v1/profile`);
+            }
+
+            // Gắn sự kiện vào nút đăng xuất
+            $('#logoutButton').on('click', function(event) {
+                event.preventDefault();
+                logout();
+            });
+        } else {
+            // Hiển thị nút đăng nhập/đăng ký
+            $('#authButtons').html('<a href="/api/v1/user/login">Login</a> <a href="/api/v1/user/register">Register</a>');
+        }
+
+        // Xử lý đăng xuất
+        function logout() {
+            $.ajax({
+                url: '/api/v1/user/logout',
+                method: 'GET',
+                success: function() {
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('email');
+                    localStorage.removeItem('userId');
+                    localStorage.removeItem('roles');
+                    window.location.href = '/api/v1/user/login?logout=true';
+                },
+                error: function(error) {
+                    console.error('Error logging out:', error);
+                }
+            });
+        }
+    });
+</script>
+
+<script>
+    // Lấy email từ local storage
+ const email = localStorage.getItem('email');
+
+ // Kiểm tra nếu email tồn tại
+ if (email) {
+     // Gửi yêu cầu tới API để lấy thông tin người dùng
+     fetch(`/api/v1/user/profile?email=${encodeURIComponent(email)}`)
+         .then(response => response.json())
+         .then(data => {
+             console.log(data);
+             // Xử lý dữ liệu người dùng ở đây
+         })
+         .catch(error => console.error('Error:', error));
+ } else {
+     console.error('Email not found in local storage');
+ }
+
+</script>
+</body>
+</html>

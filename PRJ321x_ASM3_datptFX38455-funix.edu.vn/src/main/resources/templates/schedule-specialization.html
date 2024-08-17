@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Specializations</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .card {
+            display: flex;
+            flex-direction: row; /* Sắp xếp theo hàng ngang */
+            border: 1px solid #ddd; /* Thêm đường viền cho card */
+            border-radius: 8px; /* Bo tròn các góc */
+            overflow: hidden; /* Ẩn phần thừa */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Thêm bóng cho card */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Hiệu ứng khi di chuột vào card */
+            margin-bottom: 20px; /* Khoảng cách giữa các card */
+            background-color: #fff; /* Màu nền của card */
+        }
+        .card:hover {
+            transform: scale(1.03); /* Phóng to card khi di chuột vào */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Tăng độ đậm bóng khi di chuột vào */
+        }
+        .card-img-top {
+            width: 200px; /* Chiều rộng cố định */
+            height: 260px; /* Chiều cao cố định */
+            object-fit: cover; /* Đảm bảo ảnh không bị biến dạng */
+        }
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Đẩy nút xuống dưới cùng */
+            padding: 15px;
+            flex: 1; /* Cho phép card-body mở rộng để chiếm không gian còn lại */
+            align-items: center; /* Căn giữa các phần tử con theo chiều ngang */
+        }
+        .btn-book {
+            margin-top: 10px; /* Khoảng cách phía trên nút */
+        }
+        .card-title {
+            font-size: 1.25rem; /* Kích thước tiêu đề */
+            font-weight: bold; /* Đậm tiêu đề */
+            margin-bottom: 10px; /* Khoảng cách phía dưới tiêu đề */
+            text-align: center; /* Căn giữa tiêu đề */
+        }
+        .card-text {
+            font-size: 0.9rem; /* Kích thước chữ cho thông tin */
+            margin-bottom: 8px; /* Khoảng cách phía dưới mỗi dòng thông tin */
+            text-align: center; /* Căn giữa thông tin */
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <a href="/api/v1/home" >Quay lại</a>
+    <h1>Bác sĩ chuyên khoa</h1>
+    <div id="cardsContainer" class="row">
+        <!-- Cards will be populated by JavaScript -->
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.3/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function() {
+        var specId = new URLSearchParams(window.location.search).get('specId');
+
+        $.ajax({
+            url: `http://localhost:8080/api/v1/schedule/specialization?specId=${specId}`,
+            method: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                var cardsContainer = $('#cardsContainer');
+                cardsContainer.empty(); // Clear existing cards
+
+                $.each(data, function(index, user) {
+                    var consultationCost = user.specialization ? user.specialization.consultationCost : 'N/A';
+                    var card = `
+                        <div class="col-md-12 mb-4">
+                            <div class="card">
+                                <img src="${user.avatar}" class="card-img-top" alt="Image of ${user.name}">
+                                <div class="card-body">
+                                   <h5 class="card-title">${user.name}</h5>
+                                   <p class="card-text"><strong>Email:</strong> ${user.email}</p>
+                                   <p class="card-text"><strong>Bệnh viện:</strong> ${user.namextraInfose}</p>
+                                   <p class="card-text"><strong>Số điện thoại:</strong> ${user.phone}</p>
+                                   <p class="card-text"><strong>Mô tả:</strong> ${user.description}</p>
+                                   <p class="card-text"><strong>Giá:</strong> ${user.specializationDTO.consultationCost} VNĐ</p>
+                                   <a href="http://localhost:8080/api/v1/schedule/appointment?doctorId=${user.id}&name=${user.name}&consultationCost=${user.specializationDTO.consultationCost}&specId=${user.specializationDTO.id}&clinicId=${user.clinicId}&namextraInfose=${user.namextraInfose}" class="btn btn-primary btn-book">Đặt lịch</a>
+                                </div>
+                            </div>
+                        </div>`;
+                    cardsContainer.append(card);
+                });
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error('Error fetching data:', textStatus, errorThrown);
+            }
+        });
+    });
+</script>
+</body>
+</html>

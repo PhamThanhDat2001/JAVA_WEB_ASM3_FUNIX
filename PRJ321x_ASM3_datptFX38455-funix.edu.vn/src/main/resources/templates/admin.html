@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/admin.css"> <!-- Liên kết đến tệp CSS -->
+
+    <style>
+
+    </style>
+
+    <script type="text/javascript">
+        // JavaScript kiểm tra vai trò
+        function checkRoleAndRedirect() {
+            const roles = localStorage.getItem('roles');
+            if (roles && roles.includes('ROLE_ADMIN')) {
+                return;
+            } else {
+                window.location.href = '/api/v1/access-denied';
+            }
+        }
+
+        // Gọi hàm kiểm tra khi trang được tải
+        document.addEventListener('DOMContentLoaded', checkRoleAndRedirect);
+    </script>
+
+</head>
+<body>
+<!-- Sidebar -->
+<div class="sidebar">
+    <h4 class="text-white">Quản lý Tài khoản</h4>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link text-white" href="#" data-target="#patient-accounts" data-role-id="4">
+                Tài khoản bệnh nhân
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-white" href="#" data-target="#doctor-accounts"  data-id="2">
+                Tài khoản bác sĩ
+            </a>
+        </li>
+    </ul>
+    <a href="javascript:void(0)" id="logoutButton">Đăng xuất</a>
+</div>
+
+<!-- Nội dung chính -->
+<div id="welcome" class="content">
+    <h2>ADMIN</h2>
+    <p>Danh sách tài khoản sẽ được hiển thị ở đây.</p>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+    <div class="container">
+        <!-- Nội dung chính -->
+        <div id="patient-accounts" class="content">
+            <h2>Tài khoản bệnh nhân</h2>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Họ tên</th>
+                    <th>Email</th>
+                    <th>Địa chỉ</th>
+                    <th>Số điện thoại</th>
+                    <th>Giới tính</th>
+
+                    <th>Trạng thái</th>
+                    <th>Lý do</th>
+                    <th>Hành động</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Dữ liệu sẽ được chèn vào đây bằng JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="doctor-accounts" class="content">
+            <button class="btn btn-primary tbs">Thêm bác sĩ</button>
+            <h2>Tài khoản bác sĩ</h2>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Họ tên</th>
+                    <th>Email</th>
+                    <th>Số điện thoại</th>
+                    <th>Mô tả</th>
+                    <th>Chuyên khoa</th>
+                    <th>Giới thiệu</th>
+                    <th>Bệnh viện</th>
+                    <th>QT  Đào tạo</th>
+                    <th>Thành tựu </th>
+                    <th>Trạng thái</th>
+                    <th>Lý do</th>
+                    <th>Hành động</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Dữ liệu sẽ được chèn vào đây bằng JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- Modal HTML -->
+<div class="modal fade" id="cancelModal" tabindex="-1" role="dialog" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelModalLabel">Nhập lý do</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="cancelForm">
+                    <div class="form-group">
+                        <label for="cancelReason">Lý do</label>
+                        <textarea class="form-control" id="cancelReason" rows="3" required></textarea>
+                        <input type="hidden" id="selectedUserId" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Xác nhận</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal HTML -->
+<div class="modal fade" id="addDoctorModal" tabindex="-1" role="dialog" aria-labelledby="addDoctorModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addDoctorModalLabel">Thêm bác sĩ</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addDoctorForm">
+                    <div class="form-group">
+                        <label for="doctorName">Họ tên</label>
+                        <input type="text" class="form-control" id="doctorName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="doctorEmail">Email</label>
+                        <input type="email" class="form-control" id="doctorEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="doctorAddress">Địa chỉ</label>
+                        <input type="text" class="form-control" id="doctorAddress">
+                    </div>
+                    <div class="form-group">
+                        <label for="doctorPhone">Số điện thoại</label>
+                        <input type="text" class="form-control" id="doctorPhone">
+                    </div>
+                    <div class="form-group">
+                        <label for="doctorGender">Giới tính</label>
+                        <input type="text" class="form-control" id="doctorGender">
+                    </div>
+                    <div class="form-group">
+                        <label for="doctorAvatar">Ảnh đại diện(link)</label>
+                        <input type="text" class="form-control" id="doctorAvatar">
+                    </div>
+                    <div class="form-group">
+                        <label for="doctorDescription">Mô tả</label>
+                        <textarea class="form-control" id="doctorDescription" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="doctorTrainingProcess">Quá trình đào tạo</label>
+                        <input type="text" class="form-control" id="doctorTrainingProcess">
+                    </div>
+                    <div class="form-group">
+                        <label for="doctorAchievement">Thành tựu</label>
+                        <input type="text" class="form-control" id="doctorAchievement">
+                    </div>
+                    <div class="form-group">
+                        <label for="doctorReason">Lý do</label>
+                        <input type="text" class="form-control" id="doctorReason">
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="clinicId">Bệnh viện</label>
+                        <select class="form-control" id="clinicId" required>
+                            <option value="" disabled selected>Chọn bệnh viện</option>
+                            <option value="1">Bệnh viện Việt Đức</option>
+                            <option value="2">Bệnh viện Chợ Rẫy</option>
+                            <option value="3">Bệnh viện Y Dược</option>
+                            <option value="4">Bệnh viện 115</option>
+                            <option value="5">Bệnh viện Hữu Nghị</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="specializationId">Chuyên khoa</label>
+                        <select class="form-control" id="specializationId" required>
+                            <option value="" disabled selected>Chọn chuyên khoa</option>
+                            <option value="1">Nội khoa</option>
+                            <option value="2">Ngoại khoa</option>
+                            <option value="3">Nhi khoa</option>
+                            <option value="4">Da liễu</option>
+                            <option value="5">Tim mạch</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Thêm bác sĩ</button>
+                    <div id="error-message" style="color:red;">
+                        <!-- Thông báo lỗi sẽ xuất hiện ở đây -->
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Hiển thị nội dung mặc định (e.g., tài khoản bệnh nhân)
+        $('#welcome').show();
+
+        // Xử lý sự kiện nhấp vào các liên kết trong thanh điều hướng
+        $('.nav-link').on('click', function(e) {
+            e.preventDefault();
+            var target = $(this).data('target');
+            var roleId = $(this).data('role-id');
+
+            // Ẩn tất cả các phần tử nội dung
+            $('.content').hide();
+
+            // Hiển thị phần tử nội dung mục tiêu
+            $(target).show();
+
+            // Thêm lớp 'active' vào liên kết được nhấp
+            $('.nav-link').removeClass('active');
+            $(this).addClass('active');
+
+            // Gửi yêu cầu AJAX để lấy dữ liệu người dùng
+            if (roleId) {
+                fetchUsersByRole(roleId, target);
+            } else {
+                fetchDoctors(target);
+            }
+        });
+
+        // Hàm gửi yêu cầu AJAX và cập nhật nội dung
+        function fetchUsersByRole(roleId, target) {
+            $.ajax({
+                url: 'http://localhost:8080/api/v1/users/by-role',
+                method: 'GET',
+                data: { roleId: roleId },
+                success: function(response) {
+                    updateContent(response, target, 'user');
+                },
+                error: function(error) {
+                    console.error('Error fetching users:', error);
+                }
+            });
+        }
+
+        function fetchDoctors(target) {
+            $.ajax({
+                url: 'http://localhost:8080/api/v1/doctors',
+                method: 'GET',
+                success: function(response) {
+                    updateContent(response, target, 'doctor');
+                },
+                error: function(error) {
+                    console.error('Error fetching doctors:', error);
+                }
+            });
+        }
+
+        // Hàm cập nhật nội dung của phần tử mục tiêu
+       function updateContent(data, target, type) {
+    var tbody = $(target).find('tbody');
+    tbody.empty(); // Xóa nội dung cũ
+
+    var seenEmails = new Set(); // Tập hợp lưu trữ các email đã thấy
+
+    data.forEach(function(item) {
+        // Kiểm tra xem email đã được thấy chưa
+        if (type === 'doctor' && seenEmails.has(item.email)) {
+            return; // Bỏ qua nếu email đã được thấy
+        }
+
+        // Thêm email vào tập hợp để theo dõi
+        if (type === 'doctor') {
+            seenEmails.add(item.email);
+        }
+
+        var row = '<tr>';
+        if (type === 'user') {
+            row += '<td>' + item.name + '</td>';
+            row += '<td>' + item.email + '</td>';
+            row += '<td>' + item.address + '</td>';
+            row += '<td>' + item.phone + '</td>';
+            row += '<td>' + item.gender + '</td>';
+<!--            row += '<td>' + item.description + '</td>';-->
+            row += '<td class="' + (item.active ? 'active-status-true' : 'active-status-false') + '">' + (item.active ? 'Hoạt động' : 'Đã khóa') + '</td>';
+            row += '<td>' + (item.reason ? item.reason : ' ') + '</td>';
+            row += '<td><button class="btn btn-' + (item.active ? 'danger' : 'success') + '" onclick="openCancelModal(' + item.id + ')">' + (item.active ? 'Khóa' : 'Mở') + '</button></td>';
+            row += '<td><button class="btn btn-primary" onclick="viewAppointments(' + item.id + ')">Xem lịch khám</button></td>'; // Thêm nút "Xem lịch khám"
+
+        } else if (type === 'doctor') {
+            row += '<td>' + item.name + '</td>';
+            row += '<td>' + item.email + '</td>';
+            row += '<td>' + item.phone + '</td>';
+            row += '<td>' + item.description + '</td>';
+            row += '<td>' + (item.specializationDTO ? item.specializationDTO.name : ' ') + '</td>';
+            row += '<td>' + (item.specializationDTO ? item.specializationDTO.description : ' ') + '</td>';
+            row += '<td>' + (item.namextraInfose ? item.namextraInfose: ' ') + '</td>';
+            row += '<td>' + (item.trainingProcess ? item.trainingProcess : ' ') + '</td>';
+            row += '<td>' + (item.achievement ? item.achievement : ' ') + '</td>';
+            row += '<td class="' + (item.active ? 'active-status-true' : 'active-status-false') + '">' + (item.active ? 'Hoạt động' : 'Đã khóa') + '</td>';
+            row += '<td>' + (item.reason ? item.reason : ' ') + '</td>';
+            row += '<td><button class="btn btn-' + (item.active ? 'danger' : 'success') + '" onclick="openCancelModal(' + item.id + ')">' + (item.active ? 'Khóa' : 'Mở') + '</button></td>';
+            row += '<td><button class="btn btn-primary" onclick="viewAppointmentsdt(' + item.id + ')">Xem lịch khám</button></td>'; // Thêm nút "Xem lịch khám"
+
+        }
+        row += '</tr>';
+        tbody.append(row);
+    });
+}
+
+        // Mở modal hủy
+        window.openCancelModal = function(id) {
+            $('#selectedUserId').val(id);
+            $('#cancelModal').modal('show');
+        }
+
+        // Xử lý gửi biểu mẫu hủy
+     // Xử lý gửi biểu mẫu hủy
+$('#cancelForm').on('submit', function(e) {
+    e.preventDefault();
+    var userId = $('#selectedUserId').val();
+    var reason = $('#cancelReason').val();
+
+    $.ajax({
+        url: '/api/v1/users/' + userId + '/cancel',
+        method: 'PUT',
+        data: { reason: reason },
+        success: function() {
+            // Đóng modal
+            $('#cancelModal').modal('hide');
+
+            // Lấy thông tin vai trò hiện tại và phần tử mục tiêu
+            var currentRoleId = $('.nav-link.active').data('role-id');
+            var cc = $('.nav-link.active').data('id');
+            var target = $('.nav-link.active').data('target');
+
+            // Cập nhật danh sách người dùng theo vai trò
+            if (currentRoleId === 4) {
+                fetchUsersByRole(currentRoleId, target); // Đối với bệnh nhân
+            } else if (cc === 2) {
+                fetchDoctors(target); // Đối với bác sĩ
+            }
+        },
+        error: function(error) {
+            console.error('Error cancelling user:', error);
+        }
+    });
+});
+
+
+ // Đăng xuất
+    $('#logoutButton').on('click', function(event) {
+        event.preventDefault();
+        logout();
+    });
+
+    function logout() {
+        $.ajax({
+            url: '/api/v1/user/logout',
+            method: 'GET',
+            success: function() {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('email');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('roles');
+                window.location.replace('/api/v1/user/login?logout=true');
+            },
+            error: function(error) {
+                console.error('Error logging out:', error);
+            }
+        });
+    }
+
+
+    $(document).ready(function() {
+    // Hiển thị modal khi nhấn nút "Thêm bác sĩ"
+    $('.tbs').on('click', function() {
+        $('#addDoctorModal').modal('show');
+    });
+
+    // Xử lý gửi biểu mẫu thêm bác sĩ
+    $('#addDoctorForm').on('submit', function(e) {
+        e.preventDefault();
+
+        var doctorData = {
+            doctor: {
+                name: $('#doctorName').val(),
+                email: $('#doctorEmail').val(),
+                address: $('#doctorAddress').val(),
+                phone: $('#doctorPhone').val(),
+                gender: $('#doctorGender').val(),
+                avatar: $('#doctorAvatar').val(),
+                description: $('#doctorDescription').val(),
+                trainingProcess: $('#doctorTrainingProcess').val(),
+                achievement: $('#doctorAchievement').val(),
+                reason: $('#doctorReason').val(),
+                isActive: true
+            },
+            clinicId: $('#clinicId').val(),
+            specializationId: $('#specializationId').val(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            deletedAt: null
+        };
+
+        $.ajax({
+            url: '/api/v1/doctor/register',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(doctorData),
+            success: function(response) {
+                // Đóng modal và làm mới dữ liệu bác sĩ
+                $('#addDoctorModal').modal('hide');
+                fetchDoctors('#doctor-accounts'); // Cập nhật danh sách bác sĩ
+            },
+<!--            error: function(error) {-->
+<!--                console.error('Error adding doctor:', error);-->
+<!--            }-->
+ error: function(jqXHR, textStatus, errorThrown) {
+            var errorMessage = 'Email đã tồn tại.';
+            if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                errorMessage = jqXHR.responseJSON.message;
+            }
+            $('#error-message').text(errorMessage); // Hiển thị thông báo lỗi trong modal
+        }
+
+        });
+    });
+});
+
+
+
+    });
+</script>
+
+
+<script>
+    $(document).ready(function() {
+        // Các phần khác của mã
+
+        // Định nghĩa hàm viewAppointments
+        window.viewAppointments = function(userId) {
+            // Điều hướng đến URL chi tiết
+            window.location.href = '/api/v1/user/sche/admin?userId=' + userId;
+        }
+
+        // Hàm khác của mã
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        // Các phần khác của mã
+
+        // Định nghĩa hàm viewAppointments
+        window.viewAppointmentsdt = function(doctorId) {
+            // Điều hướng đến URL chi tiết với doctorId
+            window.location.href = '/api/v1/doctor/sche/admin?doctorId=' + doctorId;
+        }
+
+        // Hàm khác của mã
+    });
+</script>
+
+</body>
+</html>

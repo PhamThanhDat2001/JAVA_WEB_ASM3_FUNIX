@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" type="text/css" href="/css/login.css">
+</head>
+<body>
+<form id="loginForm">
+    <div style="display:flex; justify-content:space-between">
+        <a href="/api/v1/home" class="link-button">Trang chủ</a>
+        <a href="/api/v1/user/register" class="link-button">Đăng ký</a>
+    </div>
+    <h2>Login</h2>
+
+    <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+    </div>
+    <div>
+        <label for="password">Mật khẩu:</label>
+        <input type="password" id="password" name="password" required>
+    </div>
+    <div id="error-message" style="color:red;">
+        <!-- Thông báo lỗi sẽ xuất hiện ở đây -->
+    </div>
+
+    <div>
+        <button type="submit">Đăng nhập</button>
+    </div>
+    <a href="#" th:href="@{/api/v1/forgot-password}" class="link-button">Quên mật khẩu</a>
+</form>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Ngăn chặn form gửi theo cách mặc định
+
+        // Lấy giá trị từ form
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        // Gửi yêu cầu POST đến API
+        fetch('/authenticate?email=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(password), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Response data:', data);
+            if (data.token) {
+                // Lưu token và email vào localStorage
+                localStorage.setItem('authToken', data.token);
+                localStorage.setItem('email', email);
+                localStorage.setItem('roles', data.role);
+                localStorage.setItem('userId', data.userId);
+
+                // Kiểm tra role và chuyển hướng đến trang phù hợp
+                const role = data.role;
+                if (role === 'ROLE_ADMIN') {
+                    window.location.href = '/api/v1/check-access';
+                } else if (role === 'ROLE_DOCTOR') {
+                    window.location.href = '/api/v1/doctor';
+                } else if (role === 'ROLE_PATIENT') {
+                    window.location.href = '/api/v1/home';
+                } else if (role === 'ROLE_SUPPORT') {
+                    window.location.href = '/api/v1/support';
+                } else {
+                    window.location.href = '/api/v1/home';
+                }
+            } else if (data.error) {
+                // Hiển thị thông báo lỗi
+                document.getElementById('error-message').textContent = data.error;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+
+    // Xóa token khỏi URL khi trang được tải
+    window.addEventListener('load', function() {
+        if (window.location.href.includes('token=')) {
+            let newUrl = window.location.href.split('?')[0];
+            window.history.replaceState({}, document.title, newUrl);
+        }
+    });
+</script>
+
+</body>
+</html>

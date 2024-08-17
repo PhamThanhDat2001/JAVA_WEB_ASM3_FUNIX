@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            padding: 20px;
+            margin: 0;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<h1>Register</h1>
+
+<form id="registerForm">
+    <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+        <a href="/api/v1/home" class="link-button">Trang chủ</a>
+        <a href="/api/v1/user/login" class="link-button">Đăng nhập</a>
+    </div>
+    <label for="name">Họ và tên:</label>
+    <input type="text" id="name" name="name" />
+
+    <label for="gender">Giới tính:</label>
+    <input type="text" id="gender" name="gender" />
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" />
+
+    <label for="phone">Số điện thoại:</label>
+    <input type="text" id="phone" name="phone" />
+
+    <label for="address">Địa chỉ:</label>
+    <input type="text" id="address" name="address" />
+
+    <label for="password">Mật khẩu:</label>
+    <input type="password" id="password" name="password" />
+
+    <label for="confirmPassword">Nhập lại mật khẩu:</label>
+    <input type="password" id="confirmPassword" name="confirmPassword" />
+
+    <div id="message" class="error"></div>
+
+    <button type="button" onclick="register()">Đăng ký</button>
+</form>
+
+<script>
+    async function register() {
+        const formData = {
+            name: document.getElementById('name').value,
+            gender: document.getElementById('gender').value,
+            email: document.getElementById('email').value,
+            phone: document.getElementById('phone').value,
+            address: document.getElementById('address').value,
+            password: document.getElementById('password').value,
+            confirmPassword: document.getElementById('confirmPassword').value
+        };
+
+        try {
+            const response = await fetch('/api/v1/user/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const message = document.getElementById('message');
+            if (!response.ok) {
+                const errorText = await response.text();
+                message.textContent = errorText;
+            } else {
+                const successText = await response.text();
+                message.textContent = successText;
+                message.style.color = 'green';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+</script>
+
+</body>
+</html>

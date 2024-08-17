@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checking Access</title>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const email = localStorage.getItem('email');
+        const roles = localStorage.getItem('roles');
+
+        if (!email) {
+            // Nếu không có email, chuyển đến trang đăng nhập
+            window.location.replace('/api/v1/user/login');
+        }
+        else if (roles && roles.includes('ROLE_ADMIN')) {
+            // Nếu có email và là ROLE_ADMIN, chuyển đến trang admin
+            window.location.replace('/api/v1/admin');
+        }
+        else {
+            // Nếu không phải là ROLE_ADMIN, chuyển đến trang từ chối truy cập
+            window.location.replace('/api/v1/access-denied');
+        }
+    });
+  </script>
+</head>
+<body>
+<p>Đang kiểm tra quyền truy cập...</p>
+</body>
+</html>

@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <link rel="stylesheet" type="text/css" href="/css/home.css"> <!-- Liên kết đến tệp CSS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <style>
+        .form-inline .form-control {
+            flex: 1;
+            margin-right: 10px;
+
+
+        }
+
+
+        .spec-name-input {
+            flex: 4;
+        }
+        .card {
+             cursor: pointer;
+        }
+
+
+
+#searchResults {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px; /* Khoảng cách giữa các thẻ card */
+}
+
+.card {
+    flex: 1 1 calc(33.333% - 15px); /* Điều chỉnh độ rộng của các thẻ card, thay đổi tỷ lệ theo ý muốn */
+    box-sizing: border-box;
+    margin-bottom: 15px;
+}
+
+.cardbody {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.cardimg {
+    width: 100%;
+    height: auto;
+}
+
+/* CSS cho nút "Xem chi tiết" nhỏ hơn */
+/* CSS cho nút "Xem chi tiết" nhỏ hơn */
+.btn.xct {
+    font-size: 15px; /* Kích thước chữ nhỏ hơn */
+    padding: 6px 12px; /* Padding nhỏ hơn */
+    border-radius: 4px; /* Bo góc nhẹ */
+}
+
+/* CSS cho nút "Xem lịch" nhỏ hơn */
+.btn.xl {
+    font-size: 15px;
+    padding: 6px 12px; /* Padding nhỏ hơn */
+    border-radius: 4px; /* Bo góc nhẹ */
+}
+
+/* Tùy chọn: Điều chỉnh chiều rộng nút nếu cần */
+.btn.xct, .btn.xl {
+    width: auto; /* Chiều rộng tự động theo nội dung */
+}
+
+
+
+    </style>
+</head>
+<body>
+<header>
+    <h2>TRANG CHỦ</h2>
+    <div class="header-buttons" id="authButtons">
+        <a href="/api/v1/user/login">Đăng nhâp</a>
+        <a href="/api/v1/user/register">Đăng ký</a>
+    </div>
+    <div id="userInfo" style="display: none;">
+        <div class="dropdown">
+            <a href="javascript:void(0)">Welcome, <span id="userEmail"></span></a>
+            <div class="dropdown-content">
+                <a href="/list">Danh sách</a>
+<!--                <a href="/api/v1/user/profile?email=${encodeURIComponent(email)}">Hồ sơ</a>-->
+                <a href="javascript:void(0)" id="profileLink">Hồ sơ</a>
+                <a href="javascript:void(0)" id="logoutButton">Đăng xuất</a>
+            </div>
+        </div>
+    </div>
+
+</header>
+<main class="container">
+    <!-- Tìm kiếm -->
+    <ul class="nav nav-tabs" id="searchTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="clinic-search-tab" data-toggle="tab" href="#clinic-search" role="tab" aria-controls="clinic-search" aria-selected="true">Tìm kiếm Bệnh viện</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="spec-search-tab" data-toggle="tab" href="#spec-search" role="tab" aria-controls="spec-search" aria-selected="false">Tìm kiếm Chuyên Khoa</a>
+        </li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <!-- Clinic Search Form -->
+        <div class="tab-pane fade show active" id="clinic-search" role="tabpanel" aria-labelledby="clinic-search-tab">
+            <form id="searchForm" class="form-inline mt-3">
+                <input type="text" id="nameExtraInfo" name="nameExtraInfo" class="form-control" placeholder="Tên Bệnh viện">
+                <input type="text" id="address" name="address" class="form-control" placeholder="Địa chỉ">
+                <input type="text" id="phone" name="phone" class="form-control" placeholder="Hotline">
+                <input type="text" id="consultationCost" name="consultationCost" class="form-control" placeholder="Khoảng giá (ex: 10000-20000)">
+                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+            </form>
+        </div>
+
+        <!-- Specialization Search Form -->
+        <div class="tab-pane fade" id="spec-search" role="tabpanel" aria-labelledby="spec-search-tab">
+            <form id="searchFormBySpecName" class="form-inline mt-3">
+                <input type="text" id="name" name="name" class="form-control spec-name-input" placeholder="Tên Chuyên Khoa">
+                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+            </form>
+        </div>
+    </div>
+
+
+
+    <div id="searchResults" style="margin-top:15px">
+        <!-- Kết quả tìm kiếm sẽ được hiển thị ở đây -->
+    </div>
+
+
+
+    <div>
+        <h2>Chuyên khoa</h2>
+        <div id="specialization-list" class="card-deck">
+            <!-- Data sẽ được thêm vào đây bằng JavaScript -->
+        </div>
+    </div>
+
+    <h2>Cơ sở y tế</h2>
+    <div id="clinic-list" class="card-deck">
+        <!-- Data sẽ được thêm vào đây bằng JavaScript -->
+    </div>
+
+    <div >
+        <h2>Chuyên khoa nổi bật nhất</h2>
+        <div id="top-specialization" class="card">
+            <!-- Data sẽ được thêm vào đây bằng JavaScript -->
+        </div>
+    </div>
+</main>
+<footer>
+    <div class="container">
+        <div class="footer-content row">
+            <div class="col">
+                <h5>Contact Us</h5>
+                <ul>
+                    <li><strong>Address:</strong> 123 Street, City, Country</li>
+                    <li><strong>Phone:</strong> +123 456 7890</li>
+                    <li><strong>Email:</strong> info@yourcompany.com</li>
+                </ul>
+            </div>
+            <div class="col">
+                <h5>Quick Links</h5>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Services</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+            <div class="col">
+                <h5>Follow Us</h5>
+                <ul>
+                    <li><a href="#">Facebook</a></li>
+                    <li><a href="#">Twitter</a></li>
+                    <li><a href="#">Instagram</a></li>
+                    <li><a href="#">LinkedIn</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Your Company Name. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+<script>
+    $(document).ready(function() {
+        // Kiểm tra token khi tải trang
+        const token = localStorage.getItem('authToken');
+        if (token) {
+            // Hiển thị thông tin người dùng và nút đăng xuất
+            $('#userInfo').show();
+            $('#authButtons').hide();
+
+            // Giả sử bạn có email trong payload của token
+            // Bạn có thể giải mã token để lấy email hoặc thông tin người dùng khác
+            $('#userEmail').text(email); // Thay bằng email thực tế
+
+             // Cập nhật liên kết Hồ sơ với email từ localStorage
+            if (email) {
+<!--                $('#profileLink').attr('href', `/api/v1/user/profile?email=${encodeURIComponent(email)}`);-->
+                $('#profileLink').attr('href', `/api/v1/profile`);
+            }
+
+            // Gắn sự kiện vào nút đăng xuất
+            $('#logoutButton').on('click', function(event) {
+                event.preventDefault();
+                logout();
+            });
+        } else {
+            // Hiển thị nút đăng nhập/đăng ký
+            $('#authButtons').html('<a href="/api/v1/user/login">Login</a> <a href="/api/v1/user/register">Register</a>');
+        }
+
+        // Xử lý đăng xuất
+        function logout() {
+            $.ajax({
+                url: '/api/v1/user/logout',
+                method: 'GET',
+                success: function() {
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('email');
+                    localStorage.removeItem('userId');
+                    localStorage.removeItem('roles');
+                    window.location.href = '/api/v1/user/login?logout=true';
+                },
+                error: function(error) {
+                    console.error('Error logging out:', error);
+                }
+            });
+        }
+    });
+</script>
+
+
+
+
+<script>
+    $(document).ready(function() {
+        // Fetch and display specializations
+        $.ajax({
+            url: '/api/v1/specializations',
+            method: 'GET',
+            success: function(response) {
+                if (response.status === 'success') {
+                    var specializationList = $('#specialization-list');
+                    specializationList.empty();
+                    response.data.forEach(function(spec) {
+                        specializationList.append(
+                            '<div class="card specializations-card" data-id="' + spec.id + '">' +
+                                '<img src="' + spec.image + '" class="card-img-top" alt="Image of ' + spec.name + '">' +
+                                '<div class="card-body">' +
+                                    '<h5 class="card-title">' + spec.name + '</h5>' +
+                                    '<p class="card-text">' + spec.description + '</p>' +
+                                '</div>' +
+                            '</div>'
+                        );
+                    });
+                    handleCardClicksSpec();
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            },
+            error: function(error) {
+                console.error('Error fetching specializations:', error);
+            }
+        });
+    });
+</script>
+
+
+
+<script>
+    $(document).ready(function() {
+        $.ajax({
+            url: '/api/v1/clinics',
+            method: 'GET',
+            success: function(response) {
+                if (response.status === 'success') {
+                    var clinics = response.data;
+                    var clinicList = $('#clinic-list');
+                    clinicList.empty(); // Clear old content
+                    clinics.forEach(function(clinic) {
+                        var cardHtml =
+                            '<div class="card clinic-card" data-id="' + clinic.id + '">' +
+                                '<img src="' + clinic.image + '" class="clinic-img-top" alt="Image of ' + clinic.nameExtraInfo + '">' +
+                                '<div class="clinic-body">' +
+                                    '<h5 class="clinic-title">' + clinic.nameExtraInfo + '</h5>' +
+                                    '<p class="clinic-text"><strong>Địa chỉ:</strong> ' + clinic.address + '</p>' +
+                                    '<p class="clinic-text"><strong>Hotline:</strong> ' + clinic.phone + '</p>' +
+                                    '<p class="clinic-text"><strong>Giờ mở cửa:</strong> ' + clinic.workingHours + '</p>' +
+                                '</div>' +
+                            '</div>';
+                        clinicList.append(cardHtml);
+                    });
+
+                    // Add click event to clinic-card class
+                    $('.clinic-card').on('click', function() {
+                        var clinicId = $(this).data('id');
+                        window.location.href = '/api/v1/clinic?id=' + clinicId;
+                    });
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            },
+            error: function(error) {
+                console.error('Error fetching clinics:', error);
+            }
+        });
+    });
+</script>
+
+
+<script>
+    $(document).ready(function() {
+        // Fetch and display top specialization
+        $.ajax({
+            url: '/api/v1/specialization/top',
+            method: 'GET',
+            success: function(response) {
+                if (response.status === 'success') {
+                    var topSpec = response.data;
+                    $('#top-specialization').html(
+                        '<div class="card specialization-card" data-id="' + topSpec.id + '">' +
+                            '<img src="' + topSpec.image + '" class="card-img-top" alt="Image of ' + topSpec.name + '">' +
+                            '<div class="card-body">' +
+                                '<h5 class="card-title">' + topSpec.name + '</h5>' +
+                                '<p class="card-text">' + topSpec.description + '</p>' +
+                            '</div>' +
+                        '</div>'
+                    );
+                    handleCardClicks();
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            },
+            error: function(error) {
+                console.error('Error fetching top specialization:', error);
+            }
+        });
+    });
+</script>
+<script>
+    function handleCardClicks() {
+        $('.specialization-card').on('click', function() {
+            var specId = $(this).data('id');
+            if (specId) {
+                window.location.href = '/api/v1/schedule/spec?specId=' + specId;
+            } else {
+                console.error('Error: specId is undefined or empty.');
+            }
+        });
+    }
+</script>
+<script>
+    function handleCardClicksSpec() {
+        $('.specializations-card').on('click', function() {
+            var specId = $(this).data('id');
+            if (specId) {
+                window.location.href = '/api/v1/schedule/spec?specId=' + specId;
+            } else {
+                console.error('Error: specId is undefined or empty.');
+            }
+        });
+    }
+</script>
+
+
+<script>
+    // Lấy email từ local storage
+ const email = localStorage.getItem('email');
+
+ // Kiểm tra nếu email tồn tại
+ if (email) {
+     // Gửi yêu cầu tới API để lấy thông tin người dùng
+     fetch(`/api/v1/user/profile?email=${encodeURIComponent(email)}`)
+         .then(response => response.json())
+         .then(data => {
+
+             // Xử lý dữ liệu người dùng ở đây
+         })
+         .catch(error => console.error('Error:', error));
+ } else {
+     console.error('Email not found in local storage');
+ }
+
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('#searchFormBySpecName').on('submit', function(event) {
+            event.preventDefault();
+
+            var name = $('#name').val(); // Đổi từ 'cost' thành 'name'
+
+            $.ajax({
+                url: '/api/v1/specializations/searchByName', // Đảm bảo đường dẫn là chính xác
+                method: 'GET',
+                data: {
+                    name: name // Đổi từ 'cost' thành 'name'
+                },
+                success: function(response) {
+                    var searchResults = $('#searchResults');
+                    searchResults.empty();
+
+                    if (response.status === 'success') {
+                        var resultsHtml = '';
+                        response.data.forEach(function(spec) { // Đổi từ 'clinic' thành 'spec'
+                            resultsHtml += '<div class="card">' +
+                                '<div class="card-body cardbody">' +
+                                    '<img src="' + spec.image + '" class="card-img-top  cardimg" alt="Image of ' + spec.name + '">' +
+                                    '<div class="card-body">' +
+                                        '<h5 class="card-title">' + spec.name + '</h5>' +
+                                        '<p class="card-text">' + spec.description + '</p>' +
+                                        '<a href="/api/v1/schedule/spec?specId=' + spec.id + '" class="btn btn-primary xl">Đặt lịch</a>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>'; // Thêm dấu kết thúc thẻ 'div' ở đây
+                        });
+                        searchResults.html(resultsHtml);
+                    } else {
+                        searchResults.html('<p>' + response.message + '</p>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    var errorMessage = xhr.status + ': ' + xhr.statusText;
+                    $('#searchResults').html('<p>Có lỗi xảy ra khi tìm kiếm: ' + errorMessage + '</p>');
+                    console.error('Error:', error);
+                }
+            });
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('#searchForm').on('submit', function(event) {
+            event.preventDefault();
+
+            var name = $('#nameExtraInfo').val();
+            var address = $('#address').val();
+            var phone = $('#phone').val();
+            var cost = $('#consultationCost').val();
+
+            $.ajax({
+                url: '/api/v1/clinics/search',
+                method: 'GET',
+                data: {
+                    name: name,
+                    address: address,
+                    phone: phone,
+                    cost: cost
+                },
+                success: function(response) {
+                    var searchResults = $('#searchResults');
+                    searchResults.empty();
+
+                    if (response.status === 'success') {
+                        var resultsHtml = '';
+                        response.data.forEach(function(clinic) {
+                            resultsHtml += '<div class="card">' +
+                                '<img src="' + clinic.image + '" class="card-img-top cardimg" alt="Image of ' + clinic.nameExtraInfo + '">' +
+                                '<div class="card-body cardbody">' +
+                                    '<h5 class="card-title">' + clinic.nameExtraInfo + '</h5>' +
+                                    '<p class="card-text"><strong>Địa chỉ:</strong> ' + clinic.address + '</p>' +
+                                    '<p class="card-text"><strong>Hotline:</strong> ' + clinic.phone + '</p>' +
+                                    '<p class="card-text"><strong>Giờ mở cửa:</strong> ' + clinic.workingHours + '</p>' +
+
+                                    '<a href="/api/v1/clinic?id=' + clinic.id + '" class="btn btn-primary xct">Xem chi tiết</a>' +
+                                '</div>' +
+                            '</div>';
+                        });
+                        searchResults.html(resultsHtml);
+                    } else {
+                        searchResults.html('<p>' + response.message + '</p>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    var errorMessage = xhr.status + ': ' + xhr.statusText;
+                    $('#searchResults').html('<p>Có lỗi xảy ra khi tìm kiếm: ' + errorMessage + '</p>');
+                    console.error('Error:', error);
+                }
+            });
+        });
+    });
+</script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+</body>
+</html>
